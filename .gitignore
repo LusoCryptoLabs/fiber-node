@@ -1,0 +1,9 @@
+# Belt and braces. Nothing secret should ever reach this repo: keys live only on the
+# node and in the encrypted off-site backup, and channel state must never be restored
+# from a copy (a stale commitment gets the node slashed).
+*.key
+sk
+ckb/
+fiber/
+store/
+*.env

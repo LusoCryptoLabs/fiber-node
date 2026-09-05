@@ -1,0 +1,16 @@
+[Unit]
+Description=LusoCryptoLabs Fiber routing node (RPC 8347, p2p 8348)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/trickle-fnn.env
+WorkingDirectory=/opt/fnn-run
+ExecStart=/opt/fnn-run/fnn -c /opt/fnn-run/LCL/config.yml -d /opt/fnn-run/LCL
+Restart=always
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
