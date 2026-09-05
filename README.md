@@ -21,7 +21,7 @@ remote). Rebuilding needs this repo **and** that backup; neither alone is enough
 | ports | RPC `127.0.0.1:8347`, p2p `0.0.0.0:8348` |
 | chain | testnet |
 | fnn | 0.8.1 |
-| fee | 500 millionths (0.05%) |
+| fee | 1000 millionths (0.1%), per channel |
 
 ## Building the node from nothing
 
@@ -63,9 +63,24 @@ so the only way between them is through you. A third channel to `bootnodesgp` di
 and it is checkable rather than hopeful:
 
 ```
-CkbaNode-1 and bootnodesgp directly connected: False
-their common neighbours (every 2-hop path between them): ['LusoCryptoLabs']
+bootnodesgp <-> hub          2-hop paths: ['LusoCryptoLabs']
+bootnodesgp <-> CkbaNode-2   2-hop paths: ['LusoCryptoLabs']
+bootnodesgp <-> CkbaNode-1   2-hop paths: ['LusoCryptoLabs']
+hub         <-> CkbaNode-1   already connected directly, we add nothing
+CkbaNode-2  <-> CkbaNode-1   already connected directly, we add nothing
 ```
+
+Four channels, and the one that earns its place is `bootnodesgp`: it is the sole
+gateway between that node and three others we touch. The hub channel, chosen first and
+for the wrong reason, contributes exactly one unique pair out of three.
+
+**A channel is not "redundant" or "unique" as a whole: each PAIR is.** This was the
+second thing got wrong here. The obvious move after finding the hub channel duplicated
+an existing path was to discount it, and that is backwards: the same channel is also
+the *only* path for `bootnodesgp <-> hub`. Discounting it gives that away and wins
+nothing on the pair that was lost anyway. Price by looking at the pairs a channel
+serves, not at the channel. Fees are per channel (`fnn-cli channel update_channel
+--tlc-fee-proportional-millionths`), so this is adjustable without reopening anything.
 
 Two more things that decide whether a router works:
 
