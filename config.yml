@@ -14,10 +14,13 @@ fiber:
     # Explicit, and not left to announce_listening_addr: that announces 0.0.0.0,
     # which nobody can dial. A routing node that cannot be dialled earns nothing.
     - "/ip4/82.29.173.3/tcp/8348"
-  # What this node charges to forward, in millionths. The public hubs charge 1000
-  # (0.1%); 500 undercuts them, which is how a new node with no history attracts
-  # flow. It costs nothing to change later.
-  tlc_fee_proportional_millionths: 500
+  # What this node charges to forward, in millionths, and the default applied to new
+  # channels. 1000 is the network norm. Undercutting was tried and was wrong: price
+  # follows the PAIRS a channel serves, not the channel. The hub channel duplicates
+  # one path AND is the only path for another, so discounting it gave the second away
+  # and won nothing on the first. Per-channel overrides: fnn-cli channel
+  # update_channel --tlc-fee-proportional-millionths.
+  tlc_fee_proportional_millionths: 1000
   # Accept inbound channels automatically and match them, so somebody opening a
   # channel to us gives us inbound liquidity and we give them outbound, without
   # either side asking permission.
