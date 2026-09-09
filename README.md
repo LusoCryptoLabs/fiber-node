@@ -20,7 +20,7 @@ remote). Rebuilding needs this repo **and** that backup; neither alone is enough
 | announced | `/ip4/82.29.173.3/tcp/8348/p2p/QmXWMttjTWihvGXFsGqTJH8oE2rsrtbbtQwmz3DUj2yCct` |
 | ports | RPC `127.0.0.1:8347`, p2p `0.0.0.0:8348` |
 | chain | testnet |
-| fnn | 0.8.1 |
+| fnn | 0.9.0 |
 | fee | 1000 millionths (0.1%), per channel |
 
 ## Building the node from nothing
