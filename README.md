@@ -12,6 +12,31 @@ backup, it is a loaded gun. Those live in the encrypted off-site backup
 (`BACKUP_EXTRA_PATHS` on the control plane, pushed to R2 through an rclone crypt
 remote). Rebuilding needs this repo **and** that backup; neither alone is enough.
 
+## What you get by following this
+
+A Fiber node on CKB testnet that is dialable from the outside, announced on the
+network graph under a name you choose, and that accepts inbound channels
+automatically. That is a router: it forwards other people's payments and charges a
+fee to do it.
+
+Being reachable is the whole job, and it is where most attempts fail. A node behind
+`0.0.0.0`, or on a port nobody opened, joins the graph and never carries anything.
+This repo gets that part right on the first try instead of the third.
+
+What is worth more than the config is the second half of this file. **Being a router
+is a question of topology, not configuration**, and that section is the part that took
+real money and real mistakes to learn: that you price by the pairs a channel serves
+and not by the channel, that inbound liquidity is not something you request but
+something you make by spending outwards, and that the dominant hub advertising 547
+channels has six distinct peers. Every gotcha listed further down was paid for once,
+here, so it does not have to be paid for again.
+
+**What it does not give you.** This is testnet, so the node routes and the fees are
+not money. It is not a wallet and not a payment integration. And it does not answer
+whether running a router is profitable on mainnet, because nobody has shown that yet:
+what it gives you is a node that works, and the map of what actually decides whether
+one earns.
+
 ## What it is
 
 | | |
@@ -32,16 +57,22 @@ printf '%s' "<64 hex chars, the on-chain funding key>" > /opt/fnn-run/LCL/ckb/ke
 head -c 32 /dev/urandom > /opt/fnn-run/LCL/fiber/sk   # the node's identity, keep it
 chmod 600 /opt/fnn-run/LCL/ckb/key /opt/fnn-run/LCL/fiber/sk
 
-# 2. config and unit
+# 2. the environment file the unit reads. systemd refuses to start a unit whose
+#    EnvironmentFile is missing, so this comes before the unit, not after.
+cat > /etc/lcl-fnn.env <<'EOF'
+FIBER_SECRET_KEY_PASSWORD=<the password protecting fiber/sk>
+RUST_LOG=info
+EOF
+chmod 600 /etc/lcl-fnn.env
+
+# 3. config and unit
 cp config.yml /opt/fnn-run/LCL/config.yml
 cp lcl-fnn.service /etc/systemd/system/
 ufw allow 8348/tcp
 systemctl daemon-reload && systemctl enable --now lcl-fnn
 
-# 3. the funding key's address needs CKB before any channel can be opened.
+# 4. the funding key's address needs CKB before any channel can be opened.
 ```
-
-`FIBER_SECRET_KEY_PASSWORD` must be set in `/etc/trickle-fnn.env`, which the unit reads.
 
 **Add `/opt/fnn-run/LCL` and the unit to `BACKUP_EXTRA_PATHS` on the control plane.**
 Nothing discovers a new node directory on its own; the node built on 2026-09-05 was in

@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-EnvironmentFile=/etc/trickle-fnn.env
+EnvironmentFile=/etc/lcl-fnn.env
 WorkingDirectory=/opt/fnn-run
 ExecStart=/opt/fnn-run/fnn -c /opt/fnn-run/LCL/config.yml -d /opt/fnn-run/LCL
 Restart=always
